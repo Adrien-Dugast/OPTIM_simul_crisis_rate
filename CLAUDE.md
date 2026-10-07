@@ -40,6 +40,8 @@ Rappel détaillé : [`docs/rappel_methodes_gradient.md`](docs/rappel_methodes_gr
   - `src/experiments.py` : boucles d'entraînement et balayages, résultats en `results/*.csv` ;
   - `notebooks/rapport.ipynb` : figures du rapport à partir des résultats ;
   - `tests/` : tests rapides (ratio de duration retrouvé en régime calme, orthogonalité de la mise à jour Muon).
+- **Entrées du réseau normalisées, d'ordre 1** (temps restant $\tau/T$, moneyness $\ln(S/K)$, taux centrés-réduits) ; ne pas donner au réseau les paramètres constants ni ceux du modèle. Une entrée mal mise à l'échelle crée un mauvais conditionnement qui fausse la comparaison des optimiseurs.
+- **Perte toujours construite sur le P&L**, jamais sur l'écart à un delta de référence.
 - Code et noms de variables en anglais, commentaires et docstrings en français ou en anglais (rester cohérent dans un même fichier). Fonctions courtes, sans état global.
 - Les figures se génèrent par script ou notebook, jamais à la main.
 
@@ -47,7 +49,8 @@ Rappel détaillé : [`docs/rappel_methodes_gradient.md`](docs/rappel_methodes_gr
 
 - **Langue : français.**
 - 4 pages maximum, figures comprises ; terminer par un paragraphe de 5 lignes maximum sur l'usage de l'IA, en indiquant explicitement les idées venues d'un LLM.
-- Plan d'expériences et plan du rapport : [`docs/plan.md`](docs/plan.md).
+- Plan d'expériences et plan du rapport : [`docs/plan.md`](docs/plan.md) (E0 contrôle Black–Scholes, E0 bis crise rare sur l'action, puis taux OAT/Bund).
+- Dérivation du delta de Black–Scholes : [`docs/delta_black_scholes.md`](docs/delta_black_scholes.md).
 
 ## Autres notes
 
