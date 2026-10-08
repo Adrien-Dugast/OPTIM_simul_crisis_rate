@@ -11,7 +11,7 @@ Légende de la difficulté : ★ = quelques heures, ★★ = un week-end, ★★
 Sur un vecteur, spectral = GD normalisé. On s'attend donc à ce qu'il **n'aide pas** au-delà de la normalisation.
 C'est un contrôle négatif qui montre que l'effet vient de la structure matricielle.
 
-**1.2 Quadratique à Hessienne de Kronecker : $f(W) = \tfrac12\|AWB - C\|_F^2$** ★
+**1.2 Quadratique à Hessienne de Kronecker : $f(W) = \tfrac12\Vert AWB - C\Vert _F^2$** ★
 La Hessienne vaut $(BB^\top)\otimes(A^\top A)$ : on contrôle séparément le conditionnement « à gauche » et « à droite ».
 Shampoo y est presque exact. Le spectral GD égalise les $\sigma_i$ du gradient mais ne préconditionne pas vraiment.
 Question : quand $UV^\top$ approxime-t-il bien la direction de Newton ? On peut tracer le nombre d'itérations en fonction de $\kappa(A)$ et $\kappa(B)$. Ça se relie très directement au cours sur le conditionnement.
@@ -32,7 +32,7 @@ Les classes rares contribuent peu aux grandes valeurs singulières du gradient, 
 
 ## 3. Problèmes matriciels non convexes
 
-**3.1 Factorisation matricielle $\min\|AB^\top - M\|_F^2$** ★ (piste B)
+**3.1 Factorisation matricielle $\min\Vert AB^\top - M\Vert _F^2$** ★ (piste B)
 GD apprend les valeurs singulières une par une, en marches d'escalier. Le spectral GD devrait les apprendre plus ensemble.
 On obtient des figures très lisibles (trajectoires des $\sigma_i$).
 
@@ -44,7 +44,7 @@ Ici, aller plus vite peut **nuire** à la généralisation. C'est un résultat i
 Le point selle en 0 et l'initialisation petite donnent des plateaux. Les mises à jour normalisées s'échappent-elles plus vite des plateaux ?
 On peut comparer l'effet de la profondeur sur GD et sur le spectral GD.
 
-**3.4 PCA par gradient : $\min_W \|X - WW^\top X\|_F^2$** ★
+**3.4 PCA par gradient : $\min_W \Vert X - WW^\top X\Vert _F^2$** ★
 On apprend le sous-espace principal de dimension $k$. Le conditionnement est alors lié aux écarts entre valeurs propres (eigengap).
 On regarde si le spectral GD est moins sensible à un petit eigengap.
 

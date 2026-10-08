@@ -10,7 +10,7 @@ Légende de la difficulté : ★ = quelques heures, ★★ = un week-end, ★★
 ---
 
 ## 1. Modèle à facteurs statistique (factorisation de la matrice des rendements) ★
-$R \in \mathbb{R}^{T\times N} \approx F B^\top$, avec $F$ les facteurs ($T\times k$) et $B$ les expositions ($N\times k$). On minimise $\|R - FB^\top\|_F^2$ (en version profonde, c'est une PCA).
+$R \in \mathbb{R}^{T\times N} \approx F B^\top$, avec $F$ les facteurs ($T\times k$) et $B$ les expositions ($N\times k$). On minimise $\Vert R - FB^\top\Vert _F^2$ (en version profonde, c'est une PCA).
 - **Pourquoi le spectral peut aider :** le facteur marché écrase les facteurs sectoriels. GD apprend en marches d'escalier (marché, puis secteurs, ...), alors que le spectral GD devrait les apprendre ensemble.
 - **Mesures :** trajectoires des $\sigma_i(FB^\top)$, angle entre les sous-espaces appris et les vrais facteurs (en simulation).
 - C'est la version finance de la piste B, et le plus simple pour démarrer.
@@ -27,7 +27,7 @@ $r_{t+1} = W r_t + \varepsilon_t$ (ou des caractéristiques $X_t$ à la place de
 - Le SNR est faible : on compare R² train et R² test en fonction du nombre d'itérations, pour savoir quelle méthode surapprend le plus vite. Ça se relie à l'arrêt précoce vu comme régularisation.
 
 ## 4. Estimation de matrice de précision / covariance ★★
-On minimise la log-vraisemblance gaussienne $-\log\det(LL^\top) + \mathrm{tr}(S\,LL^\top)$ en paramétrant la précision par $L$ (Cholesky ou facteur libre). On peut ajouter une contrainte facteur + diagonale.
+On minimise la log-vraisemblance gaussienne $-\log\det(LL^\top) + \mathrm{tr}(S\thinspace LL^\top)$ en paramétrant la précision par $L$ (Cholesky ou facteur libre). On peut ajouter une contrainte facteur + diagonale.
 - Le spectre de $S$ est très étalé, et la Hessienne est mal conditionnée en direction des petites valeurs propres. Or c'est justement celles qui comptent pour les portefeuilles de variance minimale.
 - **Évaluation financière :** variance hors échantillon du portefeuille de variance minimale construit avec l'estimateur obtenu. On peut comparer à la shrinkage de Ledoit–Wolf.
 
