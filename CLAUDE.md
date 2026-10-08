@@ -33,13 +33,18 @@ Rappel détaillé : [`docs/rappel_methodes_gradient.md`](docs/rappel_methodes_gr
 
 - **Langage** : Python 3.11+. **Librairies** : PyTorch (modèles, simulation vectorisée, optimiseurs), numpy, matplotlib. Pas d'autre dépendance sans raison.
 - **Reproductibilité** : graine fixée partout (`torch.manual_seed`, `numpy.random.default_rng(seed)`), scénarios de test générés une fois et réutilisés pour toutes les méthodes, plusieurs graines par configuration (moyenne ± écart-type).
-- **Organisation prévue** :
-  - `src/simulation.py` : modèle de taux à régimes et prix OAT / future Bund ;
-  - `src/hedging.py` : MLP de couverture, P&L, pertes CVaR et MSE ;
-  - `src/optimizers.py` : construction des optimiseurs (SGD, Adam, Muon, SVD exact) ;
-  - `src/experiments.py` : boucles d'entraînement et balayages, résultats en `results/*.csv` ;
-  - `notebooks/rapport.ipynb` : figures du rapport à partir des résultats ;
-  - `tests/` : tests rapides (ratio de duration retrouvé en régime calme, orthogonalité de la mise à jour Muon).
+- **Organisation** : une expérience = une `Config` ; on la lance en ligne de commande, et tout ce qu'elle produit va dans un dossier de run qui n'est jamais écrasé. Plus de notebook pour lancer les expériences.
+  - `src/config.py` : `MarketConfig`, `TrainConfig`, `Config` et les préréglages `PRESETS` (`e0`, `e0bis`) ;
+  - `src/simulation.py` : `regime_paths` (Black–Scholes avec rupture de volatilité sur une proportion $p$ des trajectoires, pré-historique pour la vol. réalisée), objet `Paths` ; plus tard modèle de taux ;
+  - `src/hedging.py` : `Features` (entrées normalisées, calibrées une fois), `HedgeNet`, P&L, pertes (`LOSSES`), références BS (`oracle_delta`, `realized_vol_delta`) ;
+  - `src/metrics.py` : `Evaluator`, mesures sur le jeu de test séparées calme / crise (perte, écart au delta oracle) ;
+  - `src/optimizers.py` : construction des optimiseurs (GD, Adam, Muon, spectral exact par SVD) ;
+  - `src/experiments.py` : `prepare` (prime, normalisation, jeu de test, pertes de référence), `train`, `run_all` (graines × optimiseurs) ;
+  - `src/runs.py` : dossiers `results/<expérience>/<date>_<étiquette>/` avec `config.json` (Config + valeurs dérivées + commit git), `history.csv`, `models/*.pt`, `figures/*.png` ;
+  - `src/plots.py` : figures d'un run, reconstruites uniquement à partir de son dossier ;
+  - `scripts/run.py` : `python -m scripts.run e0bis --p_crisis 0.02 --seeds 0 1 2 --tag p002` (chaque champ de config est une option) ; `scripts/plot.py` : regénère les figures d'un run ;
+  - `notebooks/rapport.ipynb` (plus tard) : figures du rapport à partir des dossiers de runs ;
+  - `tests/` (`python -m pytest`) : simulation (E0 reproductible, proportion de crise, vol. réalisée), P&L à la main, entrées, erreur de discrétisation de N(d1), orthogonalité des pas Spectral et Muon.
 - **Entrées du réseau normalisées, d'ordre 1** (temps restant $\tau/T$, moneyness $\ln(S/K)$, taux centrés-réduits) ; ne pas donner au réseau les paramètres constants ni ceux du modèle. Une entrée mal mise à l'échelle crée un mauvais conditionnement qui fausse la comparaison des optimiseurs.
 - **Perte toujours construite sur le P&L**, jamais sur l'écart à un delta de référence.
 - Code et noms de variables en anglais, commentaires et docstrings en français ou en anglais (rester cohérent dans un même fichier). Fonctions courtes, sans état global.
