@@ -4,7 +4,7 @@ Cadre : on minimise $f(\theta)$. Pour les réseaux et la factorisation, les para
 Conditionnement (cas $L$-lisse, $\mu$-fortement convexe) : $\kappa = L/\mu$. Sur une quadratique $f(\theta)=\tfrac12\theta^\top H\theta - b^\top\theta$, $\kappa = \lambda_{\max}(H)/\lambda_{\min}(H)$.
 
 **Fil conducteur :** presque toutes les méthodes ci-dessous sont une *descente la plus raide pour une certaine norme* :
-$$d^\star = \arg\min_{d}\ \langle G, d\rangle + \tfrac{1}{2\eta}\|d\|^2 .$$
+$$d^\star = \arg\min_{d}\ \langle G, d\rangle + \tfrac{1}{2\eta}\Vert d\Vert ^2 .$$
 Changer la norme change la géométrie, donc la manière dont la méthode subit le conditionnement.
 
 ---
@@ -28,51 +28,51 @@ $f(\theta) = \tfrac1N\sum_i \ell(\theta; x_i, y_i)$, SGD avec mini-lots : $\thet
 
 ## 4. Préconditionnement et Newton
 $$\theta_{k+1} = \theta_k - \eta P^{-1}\nabla f(\theta_k)$$
-- C'est une descente la plus raide pour la norme $\|d\|_P = \sqrt{d^\top P d}$.
+- C'est une descente la plus raide pour la norme $\Vert d\Vert _P = \sqrt{d^\top P d}$.
 - Newton ($P = \nabla^2 f$) est invariant par changement de variables affine, donc insensible à $\kappa$ localement, mais coûte cher en grande dimension.
 - Idéal : $P \approx H$, ce qui donne $\kappa(P^{-1/2}HP^{-1/2}) \approx 1$.
 
 ## 5. Méthodes adaptatives diagonales : AdaGrad, RMSProp, Adam
 Adam (Kingma & Ba, 2015) :
-$$m_k = \beta_1 m_{k-1} + (1-\beta_1)g_k,\quad v_k = \beta_2 v_{k-1} + (1-\beta_2)g_k^2,\quad \theta_{k+1} = \theta_k - \eta\,\frac{\hat m_k}{\sqrt{\hat v_k}+\epsilon}$$
+$$m_k = \beta_1 m_{k-1} + (1-\beta_1)g_k,\quad v_k = \beta_2 v_{k-1} + (1-\beta_2)g_k^2,\quad \theta_{k+1} = \theta_k - \eta\thinspace \frac{\hat m_k}{\sqrt{\hat v_k}+\epsilon}$$
 - C'est un préconditionneur **diagonal**, coordonnée par coordonnée. AdamW découple la pénalité $\ell_2$.
-- Avec $\beta_1=\beta_2=0$, on obtient **signSGD** : $\theta \leftarrow \theta - \eta\,\mathrm{sign}(g)$, qui est la descente la plus raide en norme $\ell_\infty$ (Bernstein & Newhouse, 2024).
+- Avec $\beta_1=\beta_2=0$, on obtient **signSGD** : $\theta \leftarrow \theta - \eta\thinspace \mathrm{sign}(g)$, qui est la descente la plus raide en norme $\ell_\infty$ (Bernstein & Newhouse, 2024).
 - Limite : la diagonale ignore les corrélations entre coordonnées, donc la structure matricielle de $W$.
 
 ## 6. Descente la plus raide pour une norme quelconque
-$$d^\star = \arg\min_{\|d\|\le 1}\langle G, d\rangle, \qquad \text{pas non normalisé : } \Delta = -\eta\,\|G\|_*\, d^\star$$
-où $\|\cdot\|_*$ est la norme duale.
+$$d^\star = \arg\min_{\Vert d\Vert \le 1}\langle G, d\rangle, \qquad \text{pas non normalisé : } \Delta = -\eta\thinspace \Vert G\Vert _{\ast}\thinspace  d^\star$$
+où $\Vert \cdot\Vert _{\ast}$ est la norme duale.
 
 | Norme sur $d$ | Direction $d^\star$ | Norme duale | Méthode |
 |---|---|---|---|
-| $\ell_2$ / Frobenius | $-G/\|G\|_F$ | $\ell_2$ / Frobenius | GD (normalisé) |
+| $\ell_2$ / Frobenius | $-G/\Vert G\Vert _F$ | $\ell_2$ / Frobenius | GD (normalisé) |
 | $\ell_\infty$ | $-\mathrm{sign}(G)$ | $\ell_1$ | signSGD, ≈ Adam |
-| **spectrale** $\|\cdot\|_{2\to2}$ | $-UV^\top$ si $G = U\Sigma V^\top$ | nucléaire $\sum_i\sigma_i$ | **spectral GD, Muon** |
+| **spectrale** $\Vert \cdot\Vert _{2\to2}$ | $-UV^\top$ si $G = U\Sigma V^\top$ | nucléaire $\sum_i\sigma_i$ | **spectral GD, Muon** |
 
 ## 7. Spectral gradient / Muon
 **Idée.** On prend la SVD réduite $G = U\Sigma V^\top$ et on remplace $\Sigma$ par l'identité :
-$$W_{k+1} = W_k - \eta\, U V^\top \qquad (\text{ou } -\eta\,\|G\|_*\,UV^\top \text{ pour la version non normalisée}).$$
+$$W_{k+1} = W_k - \eta\thinspace  U V^\top \qquad (\text{ou } -\eta\thinspace \Vert G\Vert _{\ast}\thinspace UV^\top \text{ pour la version non normalisée}).$$
 - $UV^\top$ est le **facteur polaire** de $G$, c'est-à-dire la matrice (semi-)orthogonale la plus proche de $G$ en norme de Frobenius.
 - Toutes les directions singulières du gradient avancent à la même vitesse : les directions « rares » (petits $\sigma_i$) sont amplifiées et les directions dominantes freinées. C'est une sorte de blanchiment de la mise à jour.
-- Pour un vecteur ($n=1$), $UV^\top = g/\|g\|$ : on retrouve le **GD normalisé**. L'effet spécifique n'apparaît donc qu'avec des paramètres matriciels.
+- Pour un vecteur ($n=1$), $UV^\top = g/\Vert g\Vert $ : on retrouve le **GD normalisé**. L'effet spécifique n'apparaît donc qu'avec des paramètres matriciels.
 
 **Muon** (Jordan et al., 2024) = momentum + orthogonalisation :
-$$M_k = \beta M_{k-1} + G_k,\qquad O_k = \mathrm{NS}(M_k) \approx \mathrm{polar}(M_k),\qquad W_{k+1} = W_k - \eta\, s\, O_k$$
+$$M_k = \beta M_{k-1} + G_k,\qquad O_k = \mathrm{NS}(M_k) \approx \mathrm{polar}(M_k),\qquad W_{k+1} = W_k - \eta\thinspace  s\thinspace  O_k$$
 (avec Nesterov en option et un facteur d'échelle $s$ dépendant de la forme, par ex. $\sqrt{\max(1, m/n)}$).
-- **Newton–Schulz** remplace la SVD par une itération polynomiale (GPU-friendly). On normalise d'abord $X_0 = M/\|M\|_F$, puis
+- **Newton–Schulz** remplace la SVD par une itération polynomiale (GPU-friendly). On normalise d'abord $X_0 = M/\Vert M\Vert _F$, puis
   - version classique (cubique) : $X \leftarrow \tfrac32 X - \tfrac12 XX^\top X$, qui converge vers $UV^\top$ ;
   - version Muon (quintique, ~5 itérations) : $X \leftarrow aX + b(XX^\top)X + c(XX^\top)^2X$ avec $(a,b,c) = (3.4445, -4.7750, 2.0315)$. Plus rapide, mais ne donne qu'une orthogonalisation approchée (valeurs singulières dans ~[0.7, 1.2]).
 - En pratique, Muon s'applique aux matrices des couches cachées ; les embeddings, la tête de sortie et les biais restent sous AdamW.
 - Il est disponible dans les versions récentes de PyTorch (`torch.optim.Muon`, à vérifier selon ta version), ce qui va dans le sens de « use built-in optimizers ».
 
-**Lien avec Shampoo.** Sans accumulation, $(GG^\top)^{-1/4}\, G\, (G^\top G)^{-1/4} = UV^\top$ : Muon est un Shampoo « sans mémoire ».
+**Lien avec Shampoo.** Sans accumulation, $(GG^\top)^{-1/4}\thinspace  G\thinspace  (G^\top G)^{-1/4} = UV^\top$ : Muon est un Shampoo « sans mémoire ».
 
 **Points d'attention pour le DM :**
 - La norme du pas ne tend pas vers 0 quand $G \to 0$ (comme sign/GD normalisé). À pas fixe, on obtient des oscillations autour de l'optimum, ce qui demande un pas décroissant. C'est un point à discuter face aux résultats de convergence linéaire de GD.
-- Sur $f(W) = \tfrac12\|XW - Y\|_F^2$, le mauvais conditionnement vient de $X^\top X$. L'orthogonalisation égalise les valeurs singulières de $G$, ce qui n'est **pas** la même chose que préconditionner par $(X^\top X)^{-1}$. Savoir quand l'un approxime l'autre est une bonne question d'étude.
+- Sur $f(W) = \tfrac12\Vert XW - Y\Vert _F^2$, le mauvais conditionnement vient de $X^\top X$. L'orthogonalisation égalise les valeurs singulières de $G$, ce qui n'est **pas** la même chose que préconditionner par $(X^\top X)^{-1}$. Savoir quand l'un approxime l'autre est une bonne question d'étude.
 
 ## 8. Shampoo, SOAP, K-FAC (préconditionneurs matriciels)
-- **Shampoo** (Gupta et al., 2018) : $L_k = L_{k-1} + G G^\top$, $R_k = R_{k-1} + G^\top G$, puis $W \leftarrow W - \eta\, L_k^{-1/4} G R_k^{-1/4}$. Préconditionneur de Kronecker, plus riche que la diagonale d'Adam.
+- **Shampoo** (Gupta et al., 2018) : $L_k = L_{k-1} + G G^\top$, $R_k = R_{k-1} + G^\top G$, puis $W \leftarrow W - \eta\thinspace  L_k^{-1/4} G R_k^{-1/4}$. Préconditionneur de Kronecker, plus riche que la diagonale d'Adam.
 - **SOAP** (Vyas et al., 2024) : Adam exécuté dans la base propre de Shampoo.
 - **K-FAC** (Martens & Grosse, 2015) : approximation de Kronecker de la matrice de Fisher (gradient naturel).
 
@@ -101,10 +101,10 @@ Vu l'énoncé (matrices, réseaux, factorisation), le sujet vise très probablem
 ## Pistes d'expériences (pour un projet sympa)
 
 **A. Régression linéaire matricielle à conditionnement contrôlé.**
-$f(W) = \tfrac12\|XW - Y\|_F^2$ avec un spectre de $X^\top X$ choisi (κ = 10, 10², 10⁴) et une cible $W^\star$ de rang/spectre contrôlé. Comparer GD, GD + momentum, Adam, spectral GD (SVD exacte vs Newton–Schulz), voire BB. Mesurer le nombre d'itérations pour atteindre ε en fonction de κ, et l'effet du pas fixe vs décroissant. Contrôle de cohérence : avec $n=1$, spectral = GD normalisé.
+$f(W) = \tfrac12\Vert XW - Y\Vert _F^2$ avec un spectre de $X^\top X$ choisi (κ = 10, 10², 10⁴) et une cible $W^\star$ de rang/spectre contrôlé. Comparer GD, GD + momentum, Adam, spectral GD (SVD exacte vs Newton–Schulz), voire BB. Mesurer le nombre d'itérations pour atteindre ε en fonction de κ, et l'effet du pas fixe vs décroissant. Contrôle de cohérence : avec $n=1$, spectral = GD normalisé.
 
 **B. Factorisation matricielle : apprentissage incrémental des valeurs singulières.**
-$\min_{A,B} \tfrac12\|AB^\top - M\|_F^2$ avec $M$ de faible rang et des valeurs singulières très étalées. GD apprend les modes un par un, en « marches d'escalier » (Saxe et al., 2014) ; les mises à jour spectrales devraient les apprendre de façon plus simultanée. On trace les trajectoires des $\sigma_i(AB^\top)$, ce qui donne une figure très parlante. Extension ERM : complétion de matrice (entrées partielles). Le biais implicite de GD vers le faible rang survit-il avec Muon ? Comparer l'erreur de test sur les entrées cachées.
+$\min_{A,B} \tfrac12\Vert AB^\top - M\Vert _F^2$ avec $M$ de faible rang et des valeurs singulières très étalées. GD apprend les modes un par un, en « marches d'escalier » (Saxe et al., 2014) ; les mises à jour spectrales devraient les apprendre de façon plus simultanée. On trace les trajectoires des $\sigma_i(AB^\top)$, ce qui donne une figure très parlante. Extension ERM : complétion de matrice (entrées partielles). Le biais implicite de GD vers le faible rang survit-il avec Muon ? Comparer l'erreur de test sur les entrées cachées.
 
 **C. Petit MLP (MNIST ou sous-ensemble de CIFAR).**
 Comparer Muon, AdamW et SGD + momentum avec un balayage du learning rate : robustesse au choix du pas, vitesse en époques et en temps réel. On peut aussi suivre le rang effectif ou le spectre des poids et des mises à jour au fil de l'entraînement, et faire une ablation sur le nombre d'itérations de Newton–Schulz.

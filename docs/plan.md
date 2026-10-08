@@ -19,7 +19,7 @@ Cadre et notations : voir [`CLAUDE.md`](../CLAUDE.md). Dérivation du delta de B
 - **Couverture** : un MLP $f_\theta$ (2 couches cachées de 64 neurones) donne la position $\delta_t$, décidée en $t$ avec l'information disponible en $t$ et tenue jusqu'à $t+1$. Le même réseau est appliqué à toutes les dates : on empile les dates dans un tenseur $(M, N, \text{entrées})$ et un seul passage donne tous les $\delta$.
 - **Entrées normalisées, d'ordre 1** : temps restant $\tau_t/T = (T-t)/T$ et moneyness $\ln(S_t/K)$ pour l'action ; niveaux centrés-réduits pour les taux. Les paramètres constants ($K$, $T$, $r$) ne sont pas donnés au réseau, et les paramètres du modèle ($\sigma$, intensité des sauts) non plus : le réseau doit les découvrir dans les trajectoires.
   *Pourquoi* : une entrée brute comme $S_t \approx 100$ crée un mauvais conditionnement artificiel, qu'Adam corrige en partie (normalisation par coordonnée) alors que SGD et Muon le subissent. On comparerait alors les optimiseurs sur un défaut de mise à l'échelle, pas sur la crise. À mentionner dans le rapport.
-- **Perte construite sur le P&L, jamais sur $\delta$** : $\mathrm{P\&L} = p_0 + \sum_t \delta_t\,\Delta X_t - \text{payoff}$, puis MSE ($\mathbb{E}[\mathrm{P\&L}^2]$) ou CVaR (Rockafellar–Uryasev). La prime $p_0$ est un scalaire appris (avec Adam). On ne régresse pas sur la réponse connue, parce que dans le cas réaliste (taux en crise, CVaR) il n'en existe pas : E0 vérifie justement que cette perte retrouve la bonne réponse là où on la connaît.
+- **Perte construite sur le P&L, jamais sur $\delta$** : $\mathrm{PnL} = p_0 + \sum_t \delta_t\thinspace \Delta X_t - \text{payoff}$, puis MSE ($\mathbb{E}[\mathrm{PnL}^2]$) ou CVaR (Rockafellar–Uryasev). La prime $p_0$ est un scalaire appris (avec Adam). On ne régresse pas sur la réponse connue, parce que dans le cas réaliste (taux en crise, CVaR) il n'en existe pas : E0 vérifie justement que cette perte retrouve la bonne réponse là où on la connaît.
 - **Une itération** = un lot de $M$ trajectoires (par exemple 4 096), tous les $\delta$, une perte, un pas d'optimiseur. Jeu de test fixe et grand, commun à toutes les méthodes.
 - **Optimiseurs comparés** : SGD + momentum, Adam, Muon (`torch.optim.Muon` sur les matrices de poids, Adam sur les biais, $p_0$ et $w$). Même budget d'itérations, taux d'apprentissage choisi par une petite grille pour chaque méthode, 5 graines.
 - **Mesures, toujours séparées entre trajectoires calmes et trajectoires de crise** : écart à la couverture de référence quand elle existe, écart-type et CVaR du P&L, en fonction des itérations et du temps de calcul.
@@ -29,17 +29,17 @@ Cadre et notations : voir [`CLAUDE.md`](../CLAUDE.md). Dérivation du delta de B
 ## 1. Plan d'expériences
 
 ### E0. Contrôle : Black–Scholes sans crise
-- Call européen vendu, $S_0 = K = 100$, $\sigma = 20\,\%$, $r = 0$, $T = 60$ jours, rebalancement quotidien, perte MSE, sans coûts.
+- Call européen vendu, $S_0 = K = 100$, $\sigma$ = 20 %, $r = 0$, $T = 60$ jours, rebalancement quotidien, perte MSE, sans coûts.
 - **Référence** : $\delta_t = N(d_1)$. Même cette couverture laisse une erreur de discrétisation : son écart-type de P&L sur le jeu de test est le niveau à atteindre.
 - **Avec les trois optimiseurs.** Attendu : tous retrouvent $N(d_1)$ (courbes $\delta$ en fonction de $S$ à quelques dates), sans différence nette de vitesse. Si Muon gagnait déjà ici, son avantage dans les étapes suivantes ne pourrait pas être attribué à la crise.
 - **Tests unitaires** : orthogonalisation de Newton–Schulz proche de $UV^\top$ obtenue par SVD sur une petite matrice ; P&L calculé à la main sur une trajectoire courte égal à celui du code.
 
 ### E0 bis. Crise rare sur l'action (Black–Scholes à deux régimes)
-- Même call, même réseau, même perte. Dans une proportion $p$ des trajectoires, une crise démarre à une date aléatoire et dure jusqu'à l'échéance : saut de prix à l'entrée en crise (par exemple $-8\,\%$), puis volatilité de 50 % au lieu de 15 %.
+- Même call, même réseau, même perte. Dans une proportion $p$ des trajectoires, une crise démarre à une date aléatoire et dure jusqu'à l'échéance : saut de prix à l'entrée en crise (par exemple −8 %), puis volatilité de 50 % au lieu de 15 %.
 - **Entrées** : on ajoute un signal de régime. D'abord l'indicateur de crise lui-même (le réseau doit apprendre une seconde fonction, vue rarement), puis, en variante plus difficile, la volatilité réalisée sur les 5 derniers jours.
-- **Référence** : après l'entrée en crise, $\delta_t = N(d_1)$ calculé avec $\sigma = 50\,\%$ ; en calme, avec $\sigma = 15\,\%$.
+- **Référence** : après l'entrée en crise, $\delta_t = N(d_1)$ calculé avec $\sigma$ = 50 % ; en calme, avec $\sigma$ = 15 %.
 - **Mesures** : itération à laquelle l'écart $|\delta_\theta - \delta^{\mathrm{ref}}|$ passe sous un seuil, séparément sur les dates de crise et les dates calmes ; écart-type du P&L des trajectoires de crise.
-- **Balayage** : $p \in \{1\,\%, 2\,\%, 5\,\%, 10\,\%, 20\,\%\}$, perte MSE puis CVaR, SGD/Adam/Muon, 5 graines.
+- **Balayage** : $p$ ∈ {1 %, 2 %, 5 %, 10 %, 20 %}, perte MSE puis CVaR, SGD/Adam/Muon, 5 graines.
 - **Figure clé possible du rapport** : gain de Muon (itérations gagnées pour apprendre le delta de crise) en fonction de $p$. Attendu si l'intuition est juste : gain croissant quand la crise devient plus rare, nul quand elle est fréquente.
 
 ### E1. Modèle de taux à deux régimes et couvertures de référence
@@ -50,7 +50,7 @@ Cadre et notations : voir [`CLAUDE.md`](../CLAUDE.md). Dérivation du delta de B
 - **Couvertures de référence** (calculées à la main) :
   - aucune couverture ;
   - couverture en duration : $\delta = -P^{OAT}/P^{B}$, optimale en calme ;
-  - couverture « oracle » de variance minimale dans chaque régime : $\delta^* = -\frac{P^{OAT}}{P^{B}}\big(1 + \frac{\mathrm{cov}(\Delta r, \Delta s)}{\mathrm{var}(\Delta r)}\big)$. En crise, la covariance est négative, donc il faut vendre moins de Bund.
+  - couverture « oracle » de variance minimale dans chaque régime : $\delta^{\ast} = -\frac{P^{OAT}}{P^{B}}\big(1 + \frac{\mathrm{cov}(\Delta r, \Delta s)}{\mathrm{var}(\Delta r)}\big)$. En crise, la covariance est négative, donc il faut vendre moins de Bund.
 - **Point à dire dans le rapport** : le saut du spread lui-même n'est pas couvrable avec le Bund seul, il reste un risque de base. Ce que le réseau peut apprendre, c'est à reconnaître la crise (niveau du spread, dernières variations) et à ajuster son ratio.
 - **Vérifications** : ordres de grandeur des trajectoires ; CVaR des trois couvertures de référence, en calme et en crise (plancher et plafond pour le réseau) ; un entraînement Adam qui retrouve le ratio de duration en calme.
 
