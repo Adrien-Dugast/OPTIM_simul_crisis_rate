@@ -43,6 +43,8 @@ Cadre et notations : voir [`CLAUDE.md`](../CLAUDE.md). Dérivation du delta de B
 - **Figure clé possible du rapport** : gain de Muon (itérations gagnées pour apprendre le delta de crise) en fonction de $p$. Attendu si l'intuition est juste : gain croissant quand la crise devient plus rare, nul quand elle est fréquente.
 
 ### E1. Modèle de taux à deux régimes et couvertures de référence
+Théorie et calculs détaillés : [`theorie_E1.md`](theorie_E1.md).
+
 - **Simulation** (horizon 3 mois, pas quotidien) : taux allemand 10 ans $r_t$ (Vasicek, moyenne 2,5 %, volatilité ≈ 0,8 % par an) et spread France $s_t$.
   - Calme : $s_t$ oscille autour de 60–70 pb, volatilité ≈ 15 pb par an, corrélation faible avec $r_t$.
   - Crise (proportion $p$ des trajectoires, date aléatoire) : saut de +20 à +40 pb (ordre de grandeur de juin 2024), volatilité accrue, et **fuite vers la qualité** : corrélation négative entre $\Delta r$ et $\Delta s$.
