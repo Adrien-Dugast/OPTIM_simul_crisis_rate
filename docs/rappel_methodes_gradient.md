@@ -54,7 +54,7 @@ où $\Vert \cdot\Vert _{\ast}$ est la norme duale.
 $$W_{k+1} = W_k - \eta\thinspace  U V^\top \qquad (\text{ou } -\eta\thinspace \Vert G\Vert _{\ast}\thinspace UV^\top \text{ pour la version non normalisée}).$$
 - $UV^\top$ est le **facteur polaire** de $G$, c'est-à-dire la matrice (semi-)orthogonale la plus proche de $G$ en norme de Frobenius.
 - Toutes les directions singulières du gradient avancent à la même vitesse : les directions « rares » (petits $\sigma_i$) sont amplifiées et les directions dominantes freinées. C'est une sorte de blanchiment de la mise à jour.
-- Pour un vecteur ($n=1$), $UV^\top = g/\Vert g\Vert $ : on retrouve le **GD normalisé**. L'effet spécifique n'apparaît donc qu'avec des paramètres matriciels.
+- Pour un vecteur ($n=1$), $UV^\top = g/\Vert g\Vert$ : on retrouve le **GD normalisé**. L'effet spécifique n'apparaît donc qu'avec des paramètres matriciels.
 
 **Muon** (Jordan et al., 2024) = momentum + orthogonalisation :
 $$M_k = \beta M_{k-1} + G_k,\qquad O_k = \mathrm{NS}(M_k) \approx \mathrm{polar}(M_k),\qquad W_{k+1} = W_k - \eta\thinspace  s\thinspace  O_k$$
@@ -91,7 +91,7 @@ Vu l'énoncé (matrices, réseaux, factorisation), le sujet vise très probablem
 | GD | $\ell_2$ | $\kappa$ | — |
 | Heavy-ball / Nesterov | $\ell_2$ + inertie | $\sqrt\kappa$ | négligeable |
 | Adam | diagonale adaptative | aide si mal conditionné *selon les axes* | $O(d)$ |
-| Spectral / Muon | norme spectrale | aide si le gradient est mal conditionné *spectralement* | SVD ou ~5 NS ($O(mn\min(m,n))$) |
+| Spectral / Muon | norme spectrale | aide si le gradient est mal conditionné *spectralement* | SVD ou environ 5 itérations de Newton–Schulz, coût en $O(mn \cdot \min(m,n))$ |
 | Shampoo | Kronecker | approche Newton pour les structures Kronecker | racines 4ᵉ matricielles |
 | Newton | Hessienne | indépendant de $\kappa$ | inversion de Hessienne |
 | BB | pas scalaire adaptatif | bon en pratique, non monotone | négligeable |
