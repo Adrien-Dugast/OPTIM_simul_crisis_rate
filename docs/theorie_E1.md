@@ -17,10 +17,10 @@ $$
 Le taux et le prix varient en sens inverse : quand le taux monte, le prix baisse.
 
 On utilise deux obligations de maturité 10 ans :
-- **OAT** (État français), au taux $y^{FR}_t = r_t + s_t$ ;
-- **Bund** (État allemand), au taux $y^{DE}_t = r_t$.
+- **OAT** (État français), au taux $y_t^{FR} = r_t + s_t$ ;
+- **Bund** (État allemand), au taux $y_t^{DE} = r_t$.
 
-Ici $r_t$ est le taux allemand 10 ans et $s_t = y^{FR}_t - y^{DE}_t$ le **spread France**. Le spread mesure la prime de risque que les investisseurs demandent pour prêter à la France plutôt qu'à l'Allemagne. Il vaut environ 50 à 80 pb sur la période récente, et c'est lui qui bouge lors des crises politiques françaises.
+Ici $r_t$ est le taux allemand 10 ans et $s_t = y_t^{FR} - y_t^{DE}$ le **spread France**. Le spread mesure la prime de risque que les investisseurs demandent pour prêter à la France plutôt qu'à l'Allemagne. Il vaut environ 50 à 80 pb sur la période récente, et c'est lui qui bouge lors des crises politiques françaises.
 
 Comme on tient les obligations pendant 3 mois, leur maturité restante diminue : à la date $t$, elle vaut $M - t$. Les prix sont donc
 
@@ -227,7 +227,7 @@ soit environ 3 % de la valeur de l'OAT. C'est du même ordre que tout le risque 
   - niveau du taux allemand $r_t$ et niveau du spread $s_t$ ;
   - volatilité réalisée du spread sur 10 jours, en log : c'est le signal de crise ;
   - position précédente $h_{t-1}$ (utile seulement avec des coûts de transaction).
-- **Sortie** : le ratio $h_t / h^{\mathrm{DV01}}_t$ plutôt que $h_t$ lui-même. La sortie est alors d'ordre 1, et la cible vaut 1 en calme et environ 0,63 en crise.
+- **Sortie** : le ratio $h_t / h_t^{\mathrm{DV01}}$ plutôt que $h_t$ lui-même. La sortie est alors d'ordre 1, et la cible vaut 1 en calme et environ 0,63 en crise.
 - **Perte** : MSE ou CVaR du P&L total (section 4).
 - Le réseau ne reçoit ni le régime, ni $\rho$, ni $\sigma_s$ : il doit les déduire des trajectoires.
 
@@ -237,6 +237,6 @@ soit environ 3 % de la valeur de l'OAT. C'est du même ordre que tout le risque 
 
 1. **Trajectoires** : tracer quelques trajectoires calmes et de crise de $r_t$ et $s_t$, et vérifier les ordres de grandeur (volatilité quotidienne, taille du saut, corrélation empirique dans chaque régime).
 2. **Couvertures de référence** : calculer par Monte-Carlo l'écart-type et la CVaR du P&L total pour les trois couvertures, séparément sur les trajectoires calmes et de crise. Les chiffres doivent être cohérents avec la section 5.5.
-3. **Premier entraînement** : un réseau entraîné avec Adam sur des trajectoires toutes calmes doit retrouver $h_t / h^{\mathrm{DV01}}_t \approx 1$.
+3. **Premier entraînement** : un réseau entraîné avec Adam sur des trajectoires toutes calmes doit retrouver $h_t / h_t^{\mathrm{DV01}} \approx 1$.
 
 Ensuite seulement, on passe à E2 et E3 (comparaison des optimiseurs, balayage de $p$).

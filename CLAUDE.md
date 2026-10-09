@@ -9,11 +9,11 @@ Contraintes de l'énoncé : PyTorch obligatoire (différentiation automatique, o
 Cas d'usage 7 (deep hedging) combiné avec une partie du cas 9 (régimes rares) de [`docs/cas_usage_finance_quant.md`](docs/cas_usage_finance_quant.md).
 
 - **Position** : longue OAT 10 ans, couverte chaque jour par le future Bund (plus liquide).
-- **Modèle de taux à deux facteurs** : taux allemand $r^{DE}_t$ (Vasicek, retour à la moyenne) + spread France $s_t$.
+- **Modèle de taux à deux facteurs** : taux allemand $r_t^{DE}$ (Vasicek, retour à la moyenne) + spread France $s_t$.
   - Régime calme : le spread bouge peu ; le ratio de couverture « duration OAT / duration Bund » suffit. C'est le **repère théorique**.
   - Régime de crise politique, de probabilité $p$ faible : le spread saute (sauts + volatilité accrue). La couverture laisse un risque de base que le réseau doit apprendre à gérer.
-- **Couverture** : un petit MLP choisit la position $\delta_t = \mathrm{NN}(t, r^{DE}_t, s_t, \delta_{t-1})$.
-  P&L final $= \Delta V^{OAT} + \sum_t \delta_t\thinspace \Delta F^{Bund}_t - \text{coûts de transaction}$.
+- **Couverture** : un petit MLP choisit la position $\delta_t = \mathrm{NN}(t, r_t^{DE}, s_t, \delta_{t-1})$.
+  P&L final $= \Delta V^{OAT} + \sum_t \delta_t\thinspace \Delta F_t^{Bund} - \text{coûts de transaction}$.
 - **Perte** : CVaR du P&L par la formule de Rockafellar–Uryasev,
   $\min_{\theta, w}\ w + \frac{1}{1-\alpha}\thinspace \mathbb{E}\big[(-\mathrm{PnL}_\theta - w)^+\big]$ ; la MSE sert de point de comparaison.
 - **Intuition testée** : les trajectoires de crise sont rares dans chaque mini-lot, donc portées par de petites valeurs singulières du gradient des couches. GD/Adam apprend à couvrir le calme bien avant la crise ; l'orthogonalisation du spectral GD (Muon) devrait remonter ces directions faibles et apprendre plus tôt la couverture de crise.

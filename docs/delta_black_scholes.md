@@ -29,7 +29,7 @@ $$
 S_t = S_0 \exp\Big(\big(\mu - \tfrac{\sigma^2}{2}\big)t + \sigma W_t\Big).
 $$
 
-**Sous $\mathbb{Q}$.** Par Girsanov, $W^{\mathbb{Q}}_t = W_t + \frac{\mu - r}{\sigma}t$ est un mouvement brownien sous $\mathbb{Q}$, et $dS_t = rS_t\thinspace dt + \sigma S_t\thinspace dW^{\mathbb{Q}}_t$. Donc $S_t$ est log-normal **sous les deux probabilités**, avec la même volatilité $\sigma$ : seule la tendance change ($\mu$ sous $\mathbb{P}$, $r$ sous $\mathbb{Q}$).
+**Sous $\mathbb{Q}$.** Par Girsanov, $W_t^{\mathbb{Q}} = W_t + \frac{\mu - r}{\sigma}t$ est un mouvement brownien sous $\mathbb{Q}$, et $dS_t = rS_t\thinspace dt + \sigma S_t\thinspace dW_t^{\mathbb{Q}}$. Donc $S_t$ est log-normal **sous les deux probabilités**, avec la même volatilité $\sigma$ : seule la tendance change ($\mu$ sous $\mathbb{P}$, $r$ sous $\mathbb{Q}$).
 - $\mathbb{P}$ décrit les trajectoires réelles : c'est sous $\mathbb{P}$ qu'on mesure le P&L de la couverture.
 - $\mathbb{Q}$ est un outil de calcul pour le prix (section 5).
 - Le delta ne dépend pas de $\mu$ (section 4). Dans nos simulations, on peut donc prendre $\mu = r = 0$, et $\mathbb{P} = \mathbb{Q}$.
@@ -117,7 +117,7 @@ $$
 
 ## 5. Résolution : la formule de Black–Scholes
 
-Par Feynman–Kac, la solution de l'EDP s'écrit comme une espérance sous la probabilité risque-neutre $\mathbb{Q}$, sous laquelle $dS_t = rS_t\thinspace dt + \sigma S_t\thinspace dW^{\mathbb{Q}}_t$ :
+Par Feynman–Kac, la solution de l'EDP s'écrit comme une espérance sous la probabilité risque-neutre $\mathbb{Q}$, sous laquelle $dS_t = rS_t\thinspace dt + \sigma S_t\thinspace dW_t^{\mathbb{Q}}$ :
 
 $$
 C(t, S) = e^{-r\tau}\thinspace \mathbb{E}^{\mathbb{Q}}\big[(S_T - K)^+ \thinspace \big|\thinspace  S_t = S\big].
@@ -136,9 +136,9 @@ Z \gt  \frac{\ln(K/S) - (r - \sigma^2/2)\tau}{\sigma\sqrt\tau} = -d_2,
 \qquad\text{avec}\quad d_2 = \frac{\ln(S/K) + (r - \sigma^2/2)\tau}{\sigma\sqrt\tau}.
 $$
 
-On découpe $(S_T - K)^+ = S_T\thinspace \mathbf{1}_{Z \gt  -d_2} - K\thinspace \mathbf{1}_{Z \gt  -d_2}$.
+On découpe $(S_T - K)^+ = S_T\thinspace \mathbf 1_{Z \gt  -d_2} - K\thinspace \mathbf 1_{Z \gt  -d_2}$.
 
-**Second terme :** $\mathbb{E}\big[K\thinspace \mathbf{1}_{Z \gt  -d_2}\big] = K\thinspace \mathbb{P}(Z \gt  -d_2) = K\thinspace N(d_2)$.
+**Second terme :** $\mathbb{E}\big[K\thinspace \mathbf 1_{Z \gt  -d_2}\big] = K\thinspace \mathbb{P}(Z \gt  -d_2) = K\thinspace N(d_2)$.
 
 **Premier terme :**
 
@@ -203,7 +203,7 @@ $$
 \boxed{\ \delta_t = \partial_S C(t, S_t) = N(d_1) \ }
 $$
 
-**Interprétation.** $\delta_t \in (0, 1)$. Il est proche de 1 quand l'option est très dans la monnaie ($S \gg K$), proche de 0 quand elle est très hors de la monnaie, et vaut environ $1/2$ à la monnaie. Quand $\tau \to 0$, il tend vers $\mathbf{1}_{S \gt  K}$ : la courbe se raidit à l'approche de l'échéance.
+**Interprétation.** $\delta_t \in (0, 1)$. Il est proche de 1 quand l'option est très dans la monnaie ($S \gg K$), proche de 0 quand elle est très hors de la monnaie, et vaut environ $1/2$ à la monnaie. Quand $\tau \to 0$, il tend vers $\mathbf 1_{S \gt  K}$ : la courbe se raidit à l'approche de l'échéance.
 
 ---
 
