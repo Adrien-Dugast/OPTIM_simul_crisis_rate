@@ -51,6 +51,7 @@ Rappel détaillé : [`docs/rappel_methodes_gradient.md`](docs/rappel_methodes_gr
 - 4 pages maximum, figures comprises ; terminer par un paragraphe de 5 lignes maximum sur l'usage de l'IA, en indiquant explicitement les idées venues d'un LLM.
 - Plan d'expériences et plan du rapport : [`docs/plan.md`](docs/plan.md) (E0 contrôle Black–Scholes, E0 bis crise rare sur l'action, puis taux OAT/Bund).
 - Dérivation du delta de Black–Scholes : [`docs/delta_black_scholes.md`](docs/delta_black_scholes.md).
+- Théorie de E1 (obligations, duration, modèle à deux régimes, couverture de variance minimale) : [`docs/theorie_E1.md`](docs/theorie_E1.md).
 
 ## Autres notes
 
