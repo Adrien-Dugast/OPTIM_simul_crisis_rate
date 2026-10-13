@@ -129,13 +129,43 @@ $$
 \mathrm{PnL} = \underbrace{P^F_T - P^F_0}_{\text{OAT}} \  - \  \sum_{t} h_t \big(P^B_{t+\Delta t} - P^B_t\big).
 $$
 
-Sur un pas, avec la duration (section 2) et en notant $A_t = D_t P^F_t$ et $B_t = D_t P^B_t$ (pour 100 de nominal, $A \approx 10 \times 72{,}6 = 726$) :
+### D'où vient l'approximation sur un pas
+
+**Étape 1 : les prix.** Avec $D_t = M - t$ le temps restant (environ 10 ans), qui est aussi la duration d'un zéro-coupon :
+
+$$
+P^F_t = 100\thinspace e^{-(r_t + s_t) D_t}, \qquad P^B_t = 100\thinspace e^{-r_t D_t}.
+$$
+
+**Étape 2 : Taylor à l'ordre 1 en le taux.** La dérivée d'un prix par rapport à son taux est $-D_t$ fois le prix (section 2). Le taux de l'OAT est $r_t + s_t$, celui du Bund est $r_t$, donc sur un jour
+
+$$
+\Delta P^F_t \approx -D_t P^F_t\thinspace (\Delta r_t + \Delta s_t) = -A_t\thinspace (\Delta r_t + \Delta s_t), \qquad \Delta P^B_t \approx -D_t P^B_t\thinspace \Delta r_t = -B_t\thinspace \Delta r_t ,
+$$
+
+avec
+
+$$
+A_t = D_t P^F_t, \qquad B_t = D_t P^B_t .
+$$
+
+$A_t$ et $B_t$ sont donc les **sensibilités en euros** de chaque obligation à son propre taux : la perte pour une hausse du taux de 1 (soit 100 %). Multipliées par $10^{-4}$, ce sont les DV01 de la section 2.
+
+**Étape 3 : ordres de grandeur.** Pour 100 de nominal, $A \approx 10 \times 72{,}6 = 726$ et $B \approx 10 \times 77{,}9 = 779$. Si le taux français monte de 10 pb ($\Delta y = 0{,}001$), l'OAT perd environ $726 \times 0{,}001 \approx 0{,}73$.
+
+**Étape 4 : le portefeuille.** On détient une OAT et on a vendu $h_t$ Bunds, donc $\Delta \mathrm{PnL}_t = \Delta P^F_t - h_t\thinspace \Delta P^B_t$, et en remplaçant :
 
 $$
 \Delta \mathrm{PnL}_t \approx -A_t\thinspace  (\Delta r_t + \Delta s_t) + h_t\thinspace  B_t\thinspace  \Delta r_t .
 $$
 
-Le premier terme est la perte de l'OAT quand les taux français montent. Le second est le gain de la vente de Bund quand les taux allemands montent.
+Le premier terme est la perte de l'OAT quand les taux français montent. Le second est le gain de la vente de Bund quand les taux allemands montent : le signe moins de la vente et celui de $\Delta P^B_t$ se compensent.
+
+**Ce qu'on néglige.**
+- La convexité, le terme en $(\Delta y)^2$, minuscule sur un jour (section 2).
+- La dérive due au temps qui passe : à taux fixé, le prix remonte vers 100 à l'échéance, de $y\thinspace P\thinspace \Delta t$ par pas. Elle est déterministe, donc elle ne change pas la variance du P&L, et elle se compense presque entre l'OAT et les Bunds vendus.
+
+La simulation, elle, calcule les prix exacts : cette approximation sert seulement à dériver les couvertures de référence. Par exemple, avec $h_t = A_t / B_t$, le terme en $\Delta r_t$ disparaît et il ne reste que $-A_t\thinspace \Delta s_t$, le risque de spread (section 5.2).
 
 ---
 
