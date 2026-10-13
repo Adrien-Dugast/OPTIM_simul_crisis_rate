@@ -123,7 +123,7 @@ Ce sont des ordres de grandeur raisonnables, pas une calibration.
 
 ## 4. La position et son P&L
 
-On détient **une OAT** (nominal 100) et on **vend** $h_t$ Bunds chaque jour, avec $h_t \geq 0$ en pratique. Sans coûts de transaction ni financement, le P&L sur l'horizon vaut
+On détient **une OAT** (nominal 100) et une **position vendeuse** de $h_t$ Bunds, avec $h_t \geq 0$ en pratique. $h_t$ est le **stock** total de Bunds vendus détenu entre $t$ et $t + \Delta t$, pas la quantité vendue ce jour-là : chaque jour on ajuste la position de $h_{t-\Delta t}$ à $h_t$, en vendant ou rachetant la différence. Sans coûts de transaction ni financement, le P&L sur l'horizon vaut
 
 $$
 \mathrm{PnL} = \underbrace{P^F_T - P^F_0}_{\text{OAT}} \  - \  \sum_{t} h_t \big(P^B_{t+\Delta t} - P^B_t\big).
@@ -153,7 +153,7 @@ $A_t$ et $B_t$ sont donc les **sensibilités en euros** de chaque obligation à 
 
 **Étape 3 : ordres de grandeur.** Pour 100 de nominal, $A \approx 10 \times 72{,}6 = 726$ et $B \approx 10 \times 77{,}9 = 779$. Si le taux français monte de 10 pb ($\Delta y = 0{,}001$), l'OAT perd environ $726 \times 0{,}001 \approx 0{,}73$.
 
-**Étape 4 : le portefeuille.** On détient une OAT et on a vendu $h_t$ Bunds, donc $\Delta \mathrm{PnL}_t = \Delta P^F_t - h_t\thinspace \Delta P^B_t$, et en remplaçant :
+**Étape 4 : le portefeuille.** On détient une OAT et une position vendeuse de $h_t$ Bunds, donc $\Delta \mathrm{PnL}_t = \Delta P^F_t - h_t\thinspace \Delta P^B_t$, et en remplaçant :
 
 $$
 \Delta \mathrm{PnL}_t \approx -A_t\thinspace  (\Delta r_t + \Delta s_t) + h_t\thinspace  B_t\thinspace  \Delta r_t .
