@@ -129,6 +129,44 @@ $$
 \mathrm{PnL} = \underbrace{P^F_T - P^F_0}_{\text{OAT}} \  - \  \sum_{t} h_t \big(P^B_{t+\Delta t} - P^B_t\big).
 $$
 
+### Le P&L d'un jour : le calcul exact
+
+On note $\Delta \mathrm{PnL}_t$ le gain entre $t$ et $t + \Delta t$, c'est-à-dire le terme d'indice $t$ de la somme ci-dessus. Pour un prix $P$, la variation est prise vers l'avant :
+
+$$
+\Delta P_t = P_{t+\Delta t} - P_t .
+$$
+
+**Étape 1 : le portefeuille en $t$, juste après le rebalancement.** Il a trois lignes : une OAT (valeur $P^F_t$), une position vendeuse de $h_t$ Bunds (valeur $-h_t P^B_t$) et le cash $C_t$ reçu des ventes de Bund. Sa valeur est
+
+$$
+V_t = P^F_t - h_t\thinspace P^B_t + C_t .
+$$
+
+**Étape 2 : en $t + \Delta t$, avant de rebalancer.** Les quantités n'ont pas changé, seuls les prix ont bougé (et le cash ne rapporte rien, financement nul) :
+
+$$
+V_{t+\Delta t} = P^F_{t+\Delta t} - h_t\thinspace P^B_{t+\Delta t} + C_t .
+$$
+
+**Étape 3 : la différence.** Le cash s'annule et $h_t$ se met en facteur, puisque c'est la même quantité aux deux dates :
+
+$$
+\Delta \mathrm{PnL}_t = V_{t+\Delta t} - V_t = \big(P^F_{t+\Delta t} - P^F_t\big) - h_t \big(P^B_{t+\Delta t} - P^B_t\big) = \Delta P^F_t - h_t\thinspace \Delta P^B_t .
+$$
+
+**Étape 4 : le rebalancement ne change pas la valeur (autofinancement).** En $t + \Delta t$, on passe de $h_t$ à $h_{t+\Delta t}$ en vendant la différence au prix $P^B_{t+\Delta t}$, ce qui fait entrer ce montant en cash. La valeur après rebalancement vaut
+
+$$
+P^F_{t+\Delta t} - h_{t+\Delta t}\thinspace P^B_{t+\Delta t} + C_t + \big(h_{t+\Delta t} - h_t\big) P^B_{t+\Delta t} = P^F_{t+\Delta t} - h_t\thinspace P^B_{t+\Delta t} + C_t ,
+$$
+
+c'est-à-dire la même qu'avant. Le terme « prix fois variation de la quantité » existe sur la ligne Bund, mais il est exactement compensé par le cash : rebalancer au prix du marché change la composition du portefeuille, pas sa valeur. C'est la même condition d'autofinancement que pour $X_t$ dans E0. La variation de la position n'intervient que via les coûts de transaction, proportionnels à $\vert h_{t+\Delta t} - h_t \vert$.
+
+En sommant les $\Delta \mathrm{PnL}_t$ sur tous les jours, on retrouve la formule du P&L sur l'horizon.
+
+**Exemple chiffré.** Avec $h_t = 0{,}9$, si l'OAT passe de 72,6 à 72,5 et le Bund de 77,9 à 77,8, alors $\Delta \mathrm{PnL}_t = -0{,}1 - 0{,}9 \times (-0{,}1) = -0{,}01$. On perd 0,1 sur l'OAT et on gagne 0,09 sur les Bunds vendus.
+
 ### D'où vient l'approximation sur un pas
 
 **Étape 1 : les prix.** Avec $D_t = M - t$ le temps restant (environ 10 ans), qui est aussi la duration d'un zéro-coupon :
@@ -153,10 +191,10 @@ $A_t$ et $B_t$ sont donc les **sensibilités en euros** de chaque obligation à 
 
 **Étape 3 : ordres de grandeur.** Pour 100 de nominal, $A \approx 10 \times 72{,}6 = 726$ et $B \approx 10 \times 77{,}9 = 779$. Si le taux français monte de 10 pb ($\Delta y = 0{,}001$), l'OAT perd environ $726 \times 0{,}001 \approx 0{,}73$.
 
-**Étape 4 : le portefeuille.** On détient une OAT et une position vendeuse de $h_t$ Bunds, donc $\Delta \mathrm{PnL}_t = \Delta P^F_t - h_t\thinspace \Delta P^B_t$, et en remplaçant :
+**Étape 4 : le portefeuille.** On part du P&L d'un jour calculé plus haut, $\Delta \mathrm{PnL}_t = \Delta P^F_t - h_t\thinspace \Delta P^B_t$, et on remplace les deux variations de prix par leurs approximations :
 
 $$
-\Delta \mathrm{PnL}_t \approx -A_t\thinspace  (\Delta r_t + \Delta s_t) + h_t\thinspace  B_t\thinspace  \Delta r_t .
+\Delta \mathrm{PnL}_t \approx -A_t\thinspace (\Delta r_t + \Delta s_t) - h_t \big(-B_t\thinspace \Delta r_t\big) = -A_t\thinspace  (\Delta r_t + \Delta s_t) + h_t\thinspace  B_t\thinspace  \Delta r_t .
 $$
 
 Le premier terme est la perte de l'OAT quand les taux français montent. Le second est le gain de la vente de Bund quand les taux allemands montent : le signe moins de la vente et celui de $\Delta P^B_t$ se compensent.
