@@ -131,7 +131,11 @@ $$
 
 ### Le P&L d'un jour : le calcul exact
 
-On note $\Delta \mathrm{PnL}_t$ le gain entre $t$ et $t + \Delta t$, c'est-à-dire le terme d'indice $t$ de la somme ci-dessus, et $\Delta P_t = P_{t+\Delta t} - P_t$ la variation d'un prix vers l'avant.
+On note $\Delta \mathrm{PnL}_t$ le gain entre $t$ et $t + \Delta t$, c'est-à-dire le terme d'indice $t$ de la somme ci-dessus. Pour un prix $P$, la variation est prise vers l'avant :
+
+$$
+\Delta P_t = P_{t+\Delta t} - P_t .
+$$
 
 **Étape 1 : le portefeuille en $t$, juste après le rebalancement.** Il a trois lignes : une OAT (valeur $P^F_t$), une position vendeuse de $h_t$ Bunds (valeur $-h_t P^B_t$) et le cash $C_t$ reçu des ventes de Bund. Sa valeur est
 
